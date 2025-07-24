@@ -60,9 +60,13 @@
 
         var nombreRaccordableByCodePostal = document.getElementById('nombreRaccordableByCodePostal');
 
+         
         $(document).ready(function () {
+            
             reloadNombreRaccordableByCodePostal();
         });
     </script>
+
+    <button onclick="reloadNombreRaccordableByCodePostal() ">Rafraichir</button>
 </body>
 </html>
