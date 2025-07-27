@@ -41,8 +41,8 @@
             <ul>
                 <li><i>nom_prenom_YYYYMMDD</i>.patch</li>
             </ul>
-            Une façon simple de générer un tel patch est d'executer la commande suivante depuis votre branche de travail :
-            <br>
+            <p> Une façon simple de générer un tel patch est d'executer la commande suivante depuis votre branche de travail :
+            </p> <br>
             <ul>
                 <li>Sur un environnement linux : git format-patch origin/master --stdout &gt; <i>nom_prenom_YYYYMMDD</i>.patch</li>
             </ul>
@@ -53,7 +53,7 @@
     <?php include("footer.html"); ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
- 
+
 </body>
 
 </html>
