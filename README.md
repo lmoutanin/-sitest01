@@ -23,3 +23,4 @@ Une façon simple de générer un tel patch est d'executer la commande suivante 
 Sur un environnement linux :
 
 	git format-patch origin/master --stdout > nom_prenom_YYYYMMDD.patch
+ ,

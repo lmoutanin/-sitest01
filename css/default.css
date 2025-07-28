@@ -113,6 +113,7 @@ input {
 
 #nombreRaccordableByCodePostal {
   background-color: #2c2c2c;
+  color: white;
   padding: 20px;
 }
 #nombreRaccordableByCodePostal:hover,
@@ -269,6 +270,11 @@ hr {
 .nav-item {
   margin-right: 20px;
 }
-  header {
+header {
+  padding: 20px;
+}
+
+#nombreRaccordableByCodePostal {
+  background-color: #2c2c2c;
   padding: 20px;
 }
