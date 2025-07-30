@@ -23,8 +23,9 @@
                 <div class="element">
                     <h1>RECHERCHE</h1>
                     <div class="search">
-                        <button onclick="choiceSearch('cp');">Code Postal</button>
-                        <button onclick="choiceSearch('insee');">Code Insee</button>
+
+                        <button  onclick="selectButton(this); choiceSearch('cp');">Code Postal</button>
+                        <button onclick="selectButton(this); choiceSearch('insee');">Code Insee</button>
                     </div>
                     <div id="searchBar"></div>
                 </div>
@@ -32,7 +33,7 @@
                 <div class="element">
                     <h2>ACTUALISER</h2>
                     <div class="other">
-                        <button onclick="choiceSearch();">Tableau</button>
+                        <button onclick="selectButton(this); choiceSearch();">Tableau</button>
                     </div>
                 </div>
             </div>

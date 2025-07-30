@@ -8,9 +8,9 @@ function closeElementById(id) {
 function choiceSearch(choice = "") {
     let table = ""
     if (choice === "cp") {
-        table = '<input type="search" placeholder="Entrez le code postal" onkeyup="searchByCp(this.value);"/>';
+        table = '<input type="search" placeholder="Entrez un code postal" onkeyup="searchByCp(this.value);"/>';
     } else if (choice === "insee") {
-        table += '<input type="search"  placeholder="Entrez le code postal" onkeyup="getNombreRaccordableByCodeInsee(this.value);"/>';
+        table += '<input type="search" placeholder="Entrez un code à 5 chiffres" onkeyup="getNombreRaccordableByCodeInsee(this.value);"/>';
     } else {
         closeElementById("searchBar");
         reloadNombreRaccordableByCodePostal();
@@ -18,7 +18,6 @@ function choiceSearch(choice = "") {
 
     document.getElementById("searchBar").innerHTML = table;
 }
-
 
 async function getCodeInsee(cp) {
     const url = "https://datanova.laposte.fr/data-fair/api/v1/datasets/laposte-hexasmal/lines?q=code_postal:" + cp + "&select=code_commune_insee,nom_de_la_commune";
@@ -34,56 +33,64 @@ async function getCodeInsee(cp) {
     }
 }
 
-
+function selectButton(button) {
+    const buttons = document.querySelectorAll('.tool button');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+}
 
 async function getNombreRaccordableByCodeInsee(cp) {
-    $.ajax({
-        method: "POST",
-        url: "api/index.php",
-        dataType: "json",
-        data: { "fonction": "getNombreRaccordableByCodePostal" },
-        beforeSend: function () {
-            nombreRaccordableByCodePostal.innerHTML = "";
-            nombreRaccordableByCodePostal.innerHTML = "Aucun résultat trouvé pour cette recherche.";
-        }
-    }).done(async function (data) {
-        if (data.status == true) {
-            const codeInsee = await getCodeInsee(cp);
-            const dataInsee = [];
-            const nbCpByInsee = [];
-            let nbRaccordable = 0;
+    if (cp.length !== 5) {
+        searchByCp(cp);
+    } else {
+        $.ajax({
+            method: "POST",
+            url: "api/index.php",
+            dataType: "json",
+            data: { "fonction": "getNombreRaccordableByCodePostal" },
+            beforeSend: function () {
+                nombreRaccordableByCodePostal.innerHTML = "";
+                nombreRaccordableByCodePostal.innerHTML = "Merci de patienter un instant, les données arrivent.";
+            }
+        }).done(async function (data) {
+            if (data.status == true) {
+                const codeInsee = await getCodeInsee(cp);
+                const dataInsee = [];
+                const nbCpByInsee = [];
+                let nbRaccordable = 0;
 
-            for (const NEW_DATA of data.data) {
-                if (nbCpByInsee.includes(NEW_DATA.CP)) {
+                for (const NEW_DATA of data.data) {
+                    if (nbCpByInsee.includes(NEW_DATA.CP)) {
 
-                    const index = dataInsee.findIndex(element => element.CP === NEW_DATA.CP);
-                    if (index !== -1) {
-                        nbRaccordable += parseInt(NEW_DATA.NB_RACCORDABLE);
-                        dataInsee[index].NB_RACCORDABLE += parseInt(NEW_DATA.NB_RACCORDABLE);
-                    }
-                } else {
-                    const checkCodeInsee = await getCodeInsee(NEW_DATA.CP);
-                    if (checkCodeInsee.code_commune_insee === codeInsee.code_commune_insee) {
-                        nbCpByInsee.push(NEW_DATA.CP);
-                        nbRaccordable += parseInt(NEW_DATA.NB_RACCORDABLE);
+                        const index = dataInsee.findIndex(element => element.CP === NEW_DATA.CP);
+                        if (index !== -1) {
+                            nbRaccordable += parseInt(NEW_DATA.NB_RACCORDABLE);
+                            dataInsee[index].NB_RACCORDABLE += parseInt(NEW_DATA.NB_RACCORDABLE);
+                        }
+                    } else {
+                        const checkCodeInsee = await getCodeInsee(NEW_DATA.CP);
+                        if (checkCodeInsee.code_commune_insee === codeInsee.code_commune_insee) {
+                            nbCpByInsee.push(NEW_DATA.CP);
+                            nbRaccordable += parseInt(NEW_DATA.NB_RACCORDABLE);
 
-                        const newObject = {
-                            CP: NEW_DATA.CP,
-                            NB_RACCORDABLE: parseInt(NEW_DATA.NB_RACCORDABLE)
-                        };
-                        dataInsee.push(newObject);
+                            const newObject = {
+                                CP: NEW_DATA.CP,
+                                NB_RACCORDABLE: parseInt(NEW_DATA.NB_RACCORDABLE)
+                            };
+                            dataInsee.push(newObject);
+                        }
                     }
                 }
+                if (dataInsee.length > 0) {
+                    const title = "Nombre de raccordable pour la commune de " + codeInsee.nom_de_la_commune + " (" + codeInsee.code_commune_insee + ") .";
+                    const table = buildTable(dataInsee, title.toUpperCase(), nbRaccordable);
+                    nombreRaccordableByCodePostal.innerHTML = table;
+                }
             }
-            if (dataInsee.length > 0) {
-                const title = "Nombre de raccordable pour la commune de " + codeInsee.nom_de_la_commune + " ."
-                const table = buildTable(dataInsee, title.toUpperCase(), nbRaccordable);
-                nombreRaccordableByCodePostal.innerHTML = table;
-            }
-        }
-    }).fail(function (xhr, textStatus, errorThrown) {
-        alert("Une erreur est survenue durant la récupération des données");
-    });
+        }).fail(function (xhr, textStatus, errorThrown) {
+            alert("Une erreur est survenue durant la récupération des données");
+        });
+    }
 }
 
 function searchByCp(str) {
